@@ -1,0 +1,2816 @@
+<title>Beat the Beast</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+  .viz-root {
+    --font-display: "Bebas Neue", "Arial Narrow", system-ui, sans-serif;
+    --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    color-scheme: light;
+    --surface:        #fcfcfb;
+    --plane:          #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --muted:          #898781;
+    --grid:           #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --chip-bg:        #f2f1ec;
+    --chip-bg-hover:  #e9e8e1;
+
+    --beat:    #2a78d6;   /* diverging: could beat */
+    --not:     #e34948;   /* diverging: could not beat */
+    --dk:      #dedcd3;   /* neutral: don't know */
+    --dk-text: #52514e;
+
+    --male:    #2a78d6;   /* categorical slot 1 */
+    --female:  #eb6834;   /* categorical slot 2 */
+
+    --ne:      #2a78d6;   /* categorical slot 1 */
+    --mw:      #eb6834;   /* categorical slot 2 */
+    --so:      #1baf7a;   /* categorical slot 3 */
+    --we:      #eda100;   /* categorical slot 4 */
+
+    --age1:    #6da7ec;   /* 18-34, sequential step 300 */
+    --age2:    #2a78d6;   /* 35-54, sequential step 450 */
+    --age3:    #104281;   /* 55+,   sequential step 650 */
+
+    --sig-dot: #0b0b0b;
+    --fit-line: #b0472e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .viz-root {
+      color-scheme: dark;
+      --surface:        #1a1a19;
+      --plane:          #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --muted:          #898781;
+      --grid:           #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --chip-bg:        #232320;
+      --chip-bg-hover:  #2c2c28;
+
+      --beat:    #3987e5;
+      --not:     #e66767;
+      --dk:      #46443f;
+      --dk-text: #c3c2b7;
+
+      --male:    #3987e5;
+      --female:  #d95926;
+
+      --ne:      #3987e5;
+      --mw:      #d95926;
+      --so:      #199e70;
+      --we:      #c98500;
+
+      --age1:    #6da7ec;
+      --age2:    #3987e5;
+      --age3:    #184f95;
+
+      --sig-dot: #ffffff;
+      --fit-line: #e88a72;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface:        #1a1a19;
+    --plane:          #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --muted:          #898781;
+    --grid:           #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --chip-bg:        #232320;
+    --chip-bg-hover:  #2c2c28;
+
+    --beat:    #3987e5;
+    --not:     #e66767;
+    --dk:      #46443f;
+    --dk-text: #c3c2b7;
+
+    --male:    #3987e5;
+    --female:  #d95926;
+
+    --ne:      #3987e5;
+    --mw:      #d95926;
+    --so:      #199e70;
+    --we:      #c98500;
+
+    --age1:    #6da7ec;
+    --age2:    #3987e5;
+    --age3:    #184f95;
+
+    --sig-dot: #ffffff;
+    --fit-line: #e88a72;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--plane);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+  }
+  .viz-root {
+    background: var(--plane);
+    min-height: 100%;
+    padding: 28px 16px 48px;
+  }
+  .wrap { max-width: 940px; margin: 0 auto; }
+
+  header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(44px, 10vw, 76px);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 0.88;
+    margin: 0 0 10px;
+    text-transform: uppercase;
+  }
+  header p.question {
+    font-size: 15px;
+    color: var(--text-secondary);
+    margin: 0 0 4px;
+    max-width: 62ch;
+    line-height: 1.5;
+  }
+  header p.source {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin: 0 0 4px;
+  }
+  header p.hint {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin: 0 0 20px;
+  }
+
+  .stat-strip {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 22px;
+  }
+  .stat-strip .stat {
+    background: var(--surface);
+    padding: 14px 16px;
+  }
+  .stat-strip .stat .num {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: clamp(20px, 3.4vw, 28px);
+    color: var(--text-primary);
+    display: block;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-strip .stat .lbl {
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+    display: block;
+    margin-top: 3px;
+  }
+  @media (max-width: 560px) {
+    .stat-strip { grid-template-columns: 1fr; }
+  }
+
+  .tabs {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    width: fit-content;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+  .tabs button {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    padding: 7px 14px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background-color 0.18s ease, color 0.18s ease, transform 0.1s cubic-bezier(.32,.72,0,1);
+  }
+  .tabs button:active { transform: scale(0.95); }
+  .tabs button[aria-selected="true"] {
+    background: var(--text-primary);
+    color: var(--surface);
+  }
+  .tabs.lens { margin-bottom: 18px; }
+  .tabs.lens button { font-size: 12.5px; padding: 6px 12px; }
+
+  /* sticky, translucent view-tab bar — always know where you are */
+  .tabs[aria-label="View"] {
+    position: sticky;
+    top: 10px;
+    z-index: 10;
+    background: color-mix(in srgb, var(--surface) 78%, transparent);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+  }
+  @media (prefers-reduced-transparency: reduce) {
+    .tabs[aria-label="View"] { background: var(--surface); backdrop-filter: none; -webkit-backdrop-filter: none; }
+  }
+
+  /* ---- control bar: search + selection chips + quick select ---- */
+  .control-bar {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+  }
+  .control-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .search-input {
+    flex: 1 1 220px;
+    min-width: 0;
+    appearance: none;
+    border: 1px solid var(--border);
+    background: var(--plane);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: 8px;
+  }
+  .search-input:focus-visible { outline: 2px solid var(--beat); outline-offset: -1px; }
+  .ghost-btn {
+    appearance: none;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.15s ease, transform 0.1s cubic-bezier(.32,.72,0,1);
+  }
+  .ghost-btn:hover { background: var(--chip-bg-hover); }
+  .ghost-btn:active { transform: scale(0.96); }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+  .chip {
+    appearance: none;
+    border: 1px solid var(--border);
+    background: var(--chip-bg);
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.005em;
+    padding: 5px 10px;
+    border-radius: 999px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, opacity 0.18s ease, transform 0.1s cubic-bezier(.32,.72,0,1);
+  }
+  .chip:hover { background: var(--chip-bg-hover); }
+  .chip:active { transform: scale(0.93); }
+  .chip.dim { opacity: 0.4; }
+  .chip.active {
+    background: var(--text-primary);
+    color: var(--surface);
+    border-color: var(--text-primary);
+  }
+  .chip.pop { animation: chipPop 0.32s cubic-bezier(.17,.89,.32,1.28); }
+  @keyframes chipPop { 0% { transform: scale(1); } 45% { transform: scale(1.14); } 100% { transform: scale(1); } }
+  .quick-select {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+  .quick-label { font-size: 11.5px; color: var(--muted); margin-right: 2px; letter-spacing: 0.02em; }
+  .quick-select button {
+    appearance: none;
+    border: 1px dashed var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    padding: 5px 10px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.1s cubic-bezier(.32,.72,0,1);
+  }
+  .quick-select button:hover { background: var(--chip-bg-hover); }
+  .quick-select button:active { transform: scale(0.94); }
+
+  .filter-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+  }
+  .check { display: flex; align-items: center; gap: 6px; cursor: pointer; user-select: none; }
+  .check input { cursor: pointer; }
+
+  .axis-picker-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+  }
+  .axis-picker { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text-secondary); }
+  .axis-picker select {
+    appearance: none;
+    border: 1px solid var(--border);
+    background: var(--plane);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 12.5px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    max-width: 230px;
+  }
+  .swap-btn {
+    appearance: none;
+    border: 1px solid var(--border);
+    background: var(--plane);
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 13px;
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    cursor: pointer;
+    line-height: 1;
+    transition: background-color 0.15s ease, transform 0.18s cubic-bezier(.32,.72,0,1);
+  }
+  .swap-btn:hover { background: var(--chip-bg-hover); }
+  .swap-btn:active { transform: scale(0.9) rotate(180deg); }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+  .panel.enter { opacity: 0; transform: translateY(6px); }
+  .panel.enter-active {
+    opacity: 1; transform: translateY(0);
+    transition: opacity 0.32s cubic-bezier(.22,1,.36,1), transform 0.32s cubic-bezier(.22,1,.36,1);
+  }
+
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px 14px;
+  }
+  .chart-card + .chart-card { margin-top: 14px; }
+  .chart-card.compact { padding: 16px 18px 10px; }
+  .chart-card h2 {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    margin: 0 0 4px;
+  }
+  .chart-card.compact h2 { font-size: 17px; }
+  .chart-card .sub {
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    margin: 0 0 14px;
+  }
+
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .axis-label { fill: var(--muted); font-size: 10.5px; letter-spacing: 0.01em; }
+  .grid line { stroke: var(--grid); }
+  .baseline { stroke: var(--baseline); }
+  .animal-label { fill: var(--text-primary); font-size: 12.5px; font-weight: 600; cursor: pointer; transition: fill 0.15s ease; }
+  .animal-label:hover { fill: var(--beat); }
+  .chart-card.compact .animal-label { font-size: 11px; }
+  .bar-hit { fill: transparent; cursor: pointer; }
+  .sig-dot { fill: var(--sig-dot); transition: fill 0.2s ease; }
+  .sig-dot.off { fill: none; stroke: var(--muted); stroke-width: 1.2px; }
+  .bar-seg { transition: opacity 0.28s cubic-bezier(.22,1,.36,1); }
+  .bar-seg.dimmed, .scatter-point.dimmed { opacity: 0.32; }
+  .bar-seg.picked { stroke: var(--text-primary); stroke-width: 1.6px; }
+  .scatter-point { transition: opacity 0.28s cubic-bezier(.22,1,.36,1), r 0.22s cubic-bezier(.34,1.56,.64,1); }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .legend .item { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .legend .swatch { width: 11px; height: 11px; border-radius: 3px; flex: none; }
+  .legend-note {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .legend-note svg { flex: none; width: 11px; height: 11px; }
+
+  .tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: var(--text-primary);
+    color: var(--surface);
+    font-size: 12.5px;
+    line-height: 1.45;
+    padding: 9px 11px;
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    max-width: 220px;
+    z-index: 20;
+    opacity: 0;
+    transition: opacity 0.08s ease;
+  }
+  .tooltip.show { opacity: 1; }
+  .tooltip b { font-weight: 700; }
+  .tooltip .row { display: flex; justify-content: space-between; gap: 10px; }
+  .tooltip .n { color: var(--muted); margin-top: 4px; }
+  .tooltip .hint { color: var(--muted); margin-top: 4px; font-style: italic; }
+
+  .table-toggle {
+    appearance: none;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 14px;
+    transition: background-color 0.15s ease, transform 0.1s cubic-bezier(.32,.72,0,1);
+  }
+  .table-toggle:hover { background: var(--chip-bg-hover); }
+  .table-toggle:active { transform: scale(0.96); }
+  table.data-table tbody tr { transition: background-color 0.12s ease; }
+  table.data-table tbody tr:hover { background: var(--chip-bg); }
+  table.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    margin-top: 14px;
+  }
+  table.data-table th, table.data-table td {
+    text-align: right;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border);
+    font-variant-numeric: tabular-nums;
+  }
+  table.data-table th:first-child, table.data-table td:first-child {
+    text-align: left;
+    font-weight: 600;
+  }
+  table.data-table thead th {
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .scatter-point { fill: var(--muted); cursor: pointer; }
+  .scatter-point.picked { fill: var(--beat); stroke: var(--text-primary); stroke-width: 1.5px; }
+  .scatter-label { fill: var(--text-secondary); font-size: 11px; paint-order: stroke; stroke: var(--surface); stroke-width: 3px; }
+  .fit-line { stroke: var(--fit-line); stroke-width: 1.6px; stroke-dasharray: 5 4; }
+  .corr-note {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0 0 4px;
+  }
+  .corr-note b { color: var(--text-primary); }
+  .corr-caveat {
+    font-size: 11.5px;
+    color: var(--muted);
+    margin: 0 0 16px;
+  }
+
+  .empty-note {
+    font-size: 13px;
+    color: var(--text-secondary);
+    padding: 30px 4px;
+    text-align: center;
+  }
+  .empty-note .chips { justify-content: center; margin-top: 12px; }
+
+  .headtohead {
+    background: var(--plane);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+    line-height: 1.55;
+  }
+  .headtohead b { color: var(--text-primary); }
+
+  .map-layout {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 24px;
+    align-items: center;
+  }
+  #usMap { width: 100%; height: auto; overflow: visible; }
+  /* fills are edge-to-edge (no gap, no per-tile stroke) so same-region
+     neighbors read as one shape — feedback below uses opacity/filter,
+     never transform, so it never tears that shape apart at the seams */
+  .map-region {
+    cursor: pointer;
+    opacity: 0.92;
+    transition: opacity 0.25s cubic-bezier(.22,1,.36,1), filter 0.1s ease;
+  }
+  .map-region:hover { opacity: 1; }
+  .map-region:active { filter: brightness(0.85); }
+  .map-region.active { opacity: 1; }
+  .map-region.dimmed { opacity: 0.25; }
+  .map-region.pop { animation: regionFlash 0.4s ease-out; }
+  @keyframes regionFlash { 0% { filter: brightness(1); } 35% { filter: brightness(1.35); } 100% { filter: brightness(1); } }
+  .map-border-line {
+    stroke: var(--surface);
+    stroke-width: 2.5px;
+    stroke-linecap: round;
+    pointer-events: none;
+    transition: stroke 0.25s ease, stroke-width 0.25s ease;
+  }
+  .map-border-line.active { stroke: var(--text-primary); stroke-width: 3px; }
+  .map-tile-label {
+    fill: rgba(0,0,0,0.72);
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.01em;
+    pointer-events: none;
+  }
+  .map-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 14px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+  .map-legend .item { display: flex; align-items: center; gap: 6px; }
+  .map-legend .swatch { width: 11px; height: 11px; border-radius: 3px; flex: none; }
+  .map-side {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .map-region-name {
+    font-family: var(--font-display);
+    font-size: 26px;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+  }
+  .map-callout {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  .map-callout b { color: var(--text-primary); }
+  .map-callout .row { display: flex; justify-content: space-between; gap: 10px; padding: 3px 0; border-bottom: 1px solid var(--border); }
+  @media (max-width: 640px) {
+    .map-layout { grid-template-columns: 1fr; }
+  }
+
+  footer {
+    margin-top: 22px;
+    font-size: 11.5px;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 70ch;
+  }
+
+  @media (max-width: 480px) {
+    .chart-card { padding: 16px 14px 12px; }
+    .legend .sig-note { margin-left: 0; }
+    .axis-picker select { max-width: 150px; }
+    .tabs[aria-label="View"] { position: static; }
+  }
+
+  /* keyboard focus, independent of mouse hover states above */
+  button:focus-visible, .chip:focus-visible, input:focus-visible, select:focus-visible {
+    outline: 2px solid var(--beat);
+    outline-offset: 2px;
+  }
+  .map-region:focus-visible { outline: 2px solid var(--text-primary); outline-offset: 2px; }
+
+  /* motion is a layer of meaning here, not decoration — turn it off cleanly */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+    .panel.enter { opacity: 1; transform: none; }
+  }
+</style>
+
+<div class="viz-root">
+  <div class="wrap">
+    <header>
+      <h1>Beat the Beast</h1>
+      <p class="question">"Which of the following animals, if any, do you think you could beat in a fight if you were unarmed?"</p>
+      <p class="source" id="sourceLine"></p>
+      <p class="hint">Search or click any bar / point to select animals, then compare them — or build your own correlation in Explore.</p>
+    </header>
+
+    <div class="stat-strip" id="statStrip"></div>
+
+    <div class="tabs" role="tablist" aria-label="View">
+      <button data-tab="ranking" aria-selected="true">Ranking</button>
+      <button data-tab="explore" aria-selected="false">Explore</button>
+      <button data-tab="compare" aria-selected="false">Compare</button>
+      <button data-tab="map" aria-selected="false">Map</button>
+    </div>
+
+    <div class="control-bar">
+      <div class="control-row">
+        <input type="search" id="searchInput" class="search-input" placeholder="Filter by animal name…" autocomplete="off" />
+        <button class="ghost-btn" id="clearSelectionBtn" hidden>Clear selection (<span id="selCount">0</span>)</button>
+      </div>
+      <div class="chips" id="animalChips"></div>
+      <div class="quick-select">
+        <span class="quick-label">Quick select:</span>
+        <button data-quick="top5confident">Most confident</button>
+        <button data-quick="top5danger">Most feared</button>
+        <button data-quick="siggender">Significant gender gaps</button>
+        <button data-quick="sigregion">Significant region gap</button>
+      </div>
+    </div>
+
+    <section id="panel-ranking" class="panel active">
+      <div class="tabs lens" role="tablist" aria-label="Lens">
+        <button data-lens="total" aria-selected="true">Total</button>
+        <button data-lens="gender" aria-selected="false">By gender</button>
+        <button data-lens="age" aria-selected="false">By age</button>
+        <button data-lens="region" aria-selected="false">By region</button>
+      </div>
+
+      <div class="filter-row">
+        <label class="check"><input type="checkbox" id="selectedOnlyChk"> Selected only</label>
+        <label class="check" id="sigOnlyWrap" hidden><input type="checkbox" id="sigOnlyChk"> Significant gaps only</label>
+      </div>
+
+      <div class="chart-card">
+        <h2 id="chartTitle">Who thinks they'd win?</h2>
+        <p class="sub" id="chartSub">Share of respondents who think they could beat each animal unarmed, ranked from most to least confident.</p>
+        <svg id="rankingSvg"></svg>
+        <div class="legend" id="rankingLegend"></div>
+        <div class="legend-note" id="rankingLegendNote" hidden></div>
+      </div>
+      <button class="table-toggle" id="rankingTableToggle">View as table</button>
+      <div id="rankingTableWrap" hidden></div>
+    </section>
+
+    <section id="panel-explore" class="panel">
+      <div class="axis-picker-row">
+        <div class="axis-picker">
+          <span>Y</span>
+          <select id="ySelect"></select>
+        </div>
+        <button class="swap-btn" id="swapAxes" title="Swap axes">⇄</button>
+        <div class="axis-picker">
+          <span>X</span>
+          <select id="xSelect"></select>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h2 id="exploreTitle">Build your own correlation</h2>
+        <p class="corr-note" id="corrNote"></p>
+        <p class="corr-caveat">Each point is one animal — with only 15 animals, treat every correlation here as exploratory, not confirmatory.</p>
+        <svg id="scatterSvg"></svg>
+      </div>
+      <button class="table-toggle" id="scatterTableToggle">View as table</button>
+      <div id="scatterTableWrap" hidden></div>
+    </section>
+
+    <section id="panel-compare" class="panel">
+      <div id="compareEmpty" class="empty-note" hidden>
+        <div>Select two or more animals to compare them side by side — click any bar, any point in Explore, or a chip below.</div>
+      </div>
+      <div id="compareContent" hidden>
+        <div class="headtohead" id="headToHead" hidden></div>
+        <div class="chart-card compact"><h2>Total</h2><p class="sub">Could beat, could not beat, don't know.</p><svg id="cmpSvgTotal"></svg><div class="legend" id="cmpLegendTotal"></div></div>
+        <div class="chart-card compact"><h2>By gender</h2><p class="sub">Men vs. women, could-beat share.</p><svg id="cmpSvgGender"></svg><div class="legend" id="cmpLegendGender"></div></div>
+        <div class="chart-card compact"><h2>By age</h2><p class="sub">18–34 / 35–54 / 55+, could-beat share.</p><svg id="cmpSvgAge"></svg><div class="legend" id="cmpLegendAge"></div></div>
+        <div class="chart-card compact"><h2>By region</h2><p class="sub">Northeast / Midwest / South / West, could-beat share.</p><svg id="cmpSvgRegion"></svg><div class="legend" id="cmpLegendRegion"></div></div>
+      </div>
+    </section>
+
+    <section id="panel-map" class="panel">
+      <div class="chart-card">
+        <h2>Confidence by region</h2>
+        <p class="sub">Click a region of the map to re-rank every animal by that region's confidence. Colors match the "By region" lens.</p>
+        <div class="map-layout">
+          <div>
+            <svg id="usMap" role="group" aria-label="US states, tinted by census region"></svg>
+            <div class="map-legend" id="mapLegend"></div>
+          </div>
+          <div class="map-side">
+            <div class="map-region-name" id="mapRegionName">National average</div>
+            <div class="map-callout" id="mapCallout"></div>
+            <button class="ghost-btn" id="mapResetBtn" hidden>Reset to national</button>
+          </div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h2 id="mapRankTitle">Ranked by national average</h2>
+        <p class="sub" id="mapRankSub">Share of respondents in this region who think they could beat each animal unarmed.</p>
+        <svg id="mapRankSvg"></svg>
+        <div class="legend" id="mapRankLegend"></div>
+      </div>
+    </section>
+
+    <footer>
+      Source: YouGov survey, April 12–13, 2021, n=1,224 US adults, reconstructed from the
+      published cross-tabulation PDF. Gender and region gaps are flagged significant when a
+      two-proportion z-test / chi-square test survives a Holm correction across all 15 animals
+      (α=.05). The dataset reports marginal breakdowns only (total, by gender, by age, by region
+      computed independently) — not a full cross-tabulation, so combined effects (e.g. young men
+      specifically) cannot be shown. Correlations in the Explore tab beyond the pre-registered
+      danger×age pair are computed live (Pearson r) across n=15 animals and are illustrative, not
+      hypothesis-tested.
+    </footer>
+  </div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+const DATA = {
+ "meta": {
+  "source": "YouGov, April 12-13 2021, n=1,224 US adults",
+  "question": "Which of the following animals, if any, do you think you could beat in a fight if you were unarmed?",
+  "ageCorr": {
+   "r": -0.71,
+   "p": 0.003
+  },
+  "genderSigCount": 10,
+  "regionSigCount": 1,
+  "totalAnimals": 15
+ },
+ "animals": [
+  {
+   "animal": "Rat",
+   "total": {
+    "beat": 72,
+    "not": 17,
+    "dk": 11,
+    "n": 1224
+   },
+   "gender": {
+    "Male": {
+     "beat": 76,
+     "not": 14,
+     "dk": 10,
+     "n": 587
+    },
+    "Female": {
+     "beat": 68,
+     "not": 19,
+     "dk": 13,
+     "n": 637
+    }
+   },
+   "genderSig": true,
+   "age": {
+    "18-34": {
+     "beat": 61,
+     "not": 25,
+     "dk": 15,
+     "n": 435
+    },
+    "35-54": {
+     "beat": 77,
+     "not": 11,
+     "dk": 12,
+     "n": 331
+    },
+    "55+": {
+     "beat": 78,
+     "not": 14,
+     "dk": 9,
+     "n": 458
+    }
+   },
+   "ageSlope": 4.33,
+   "dangerProxy": 17,
+   "region": {
+    "Northeast": {
+     "beat": 68,
+     "not": 17,
+     "dk": 15,
+     "n": 195
+    },
+    "Midwest": {
+     "beat": 75,
+     "not": 15,
+     "dk": 11,
+     "n": 279
+    },
+    "South": {
+     "beat": 74,
+     "not": 15,
+     "dk": 11,
+     "n": 447
+    },
+    "West": {
+     "beat": 70,
+     "not": 21,
+     "dk": 10,
+     "n": 303
+    }
+   },
+   "regionSig": false
+  },
+  {
+   "animal": "House cat",
+   "total": {
+    "beat": 69,
+    "not": 18,
+    "dk": 13,
+    "n": 1224
+   },
+   "gender": {
+    "Male": {
+     "beat": 74,
+     "not": 16,
+     "dk": 10,
+     "n": 587
+    },
+    "Female": {
+     "beat": 64,
+     "not": 20,
+     "dk": 16,
+     "n": 637
+    }
+   },
+   "genderSig": true,
+   "age": {
+    "18-34": {
+     "beat": 57,
+     "not": 27,
+     "dk": 16,
+     "n": 435
+    },
+    "35-54": {
+     "beat": 71,
+     "not": 16,
+     "dk": 13,
+     "n": 331
+    },
+    "55+": {
+     "beat": 77,
+     "not": 12,
+     "dk": 11,
+     "n": 458
+    }
+   },
+   "ageSlope": 5.11,
+   "dangerProxy": 18,
+   "region": {
+    "Northeast": {
+     "beat": 69,
+     "not": 15,
+     "dk": 16,
+     "n": 195
+    },
+    "Midwest": {
+     "beat": 71,
+     "not": 17,
+     "dk": 12,
+     "n": 279
+    },
+    "South": {
+     "beat": 71,
+     "not": 17,
+     "dk": 11,
+     "n": 447
+    },
+    "West": {
+     "beat": 64,
+     "not": 21,
+     "dk": 14,
+     "n": 303
+    }
+   },
+   "regionSig": false
+  },
+  {
+   "animal": "Goose",
+   "total": {
+    "beat": 61,
+    "not": 24,
+    "dk": 15,
+    "n": 1224
+   },
+   "gender": {
+    "Male": {
+     "beat": 71,
+     "not": 16,
+     "dk": 13,
+     "n": 587
+    },
+    "Female": {
+     "beat": 51,
+     "not": 32,
+     "dk": 17,
+     "n": 637
+    }
+   },
+   "genderSig": true,
+   "age": {
+    "18-34": {
+     "beat": 53,
+     "not": 31,
+     "dk": 16,
+     "n": 435
+    },
+    "35-54": {
+     "beat": 64,
+     "not": 21,
+     "dk": 16,
+     "n": 331
+    },
+    "55+": {
+     "beat": 66,
+     "not": 21,
+     "dk": 13,
+     "n": 458
+    }
+   },
+   "ageSlope": 3.31,
+   "dangerProxy": 24,
+   "region": {
+    "Northeast": {
+     "beat": 58,
+     "not": 23,
+     "dk": 18,
+     "n": 195
+    },
+    "Midwest": {
+     "beat": 59,
+     "not": 26,
+     "dk": 15,
+     "n": 279
+    },
+    "South": {
+     "beat": 65,
+     "not": 22,
+     "dk": 13,
+     "n": 447
+    },
+    "West": {
+     "beat": 58,
+     "not": 28,
+     "dk": 14,
+     "n": 303
+    }
+   },
+   "regionSig": false
+  },
+  {
+   "animal": "Medium sized dog",
+   "total": {
+    "beat": 49,
+    "not": 30,
+    "dk": 20,
+    "n": 1224
+   },
+   "gender": {
+    "Male": {
+     "beat": 60,
+     "not": 22,
+     "dk": 18,
+     "n": 587
+    },
+    "Female": {
+     "beat": 39,
+     "not": 38,
+     "dk": 22,
+     "n": 637
+    }
+   },
+   "genderSig": true,
+   "age": {
+    "18-34": {
+     "beat": 48,
+     "not": 32,
+     "dk": 20,
+     "n": 435
+    },
+    "35-54": {
+     "beat": 51,
+     "not": 27,
+     "dk": 22,
+     "n": 331
+    },
+    "55+": {
+     "beat": 49,
+     "not": 31,
+     "dk": 20,
+     "n": 458
+    }
+   },
+   "ageSlope": 0.25,
+   "dangerProxy": 30,
+   "region": {
+    "Northeast": {
+     "beat": 44,
+     "not": 30,
+     "dk": 26,
+     "n": 195
+    },
+    "Midwest": {
+     "beat": 51,
+     "not": 28,
+     "dk": 21,
+     "n": 279
+    },
+    "South": {
+     "beat": 53,
+     "not": 28,
+     "dk": 19,
+     "n": 447
+    },
+    "West": {
+     "beat": 46,
+     "not": 37,
+     "dk": 18,
+     "n": 303
+    }
+   },
+   "regionSig": false
+  },
+  {
+   "animal": "Eagle",
+   "total": {
+    "beat": 30,
+    "not": 50,
+    "dk": 20,
+    "n": 1224
+   },
+   "gender": {
+    "Male": {
+     "beat": 38,
+     "not": 41,
+     "dk": 22,
+     "n": 587
+    },
+    "Female": {
+     "beat": 23,
+     "not": 60,
+     "dk": 17,
+     "n": 637
+    }
+   },
+   "genderSig": true,
+   "age": {
+    "18-34": {
+     "beat": 32,
+     "not": 49,
+     "dk": 18,
+     "n": 435
+    },
+    "35-54": {
+     "beat": 31,
+     "not": 48,
+     "dk": 21,
+     "n": 331
+    },
+    "55+": {
+     "beat": 28,
+     "not": 53,
+     "dk": 19,
+     "n": 458
+    }
+   },
+   "ageSlope": -1.03,
+   "dangerProxy": 50,
+   "region": {
+    "Northeast": {
+     "beat": 33,
+     "not": 48,
+     "dk": 20,
+     "n": 195
+    },
+    "Midwest": {
+     "beat": 25,
+     "not": 56,
+     "dk": 19,
+     "n": 279
+    },
+    "South": {
+     "beat": 33,
+     "not": 46,
+     "dk": 21,
+     "n": 447
+    },
+    "West": {
+     "beat": 29,
+     "not": 53,
+     "dk": 18,
+     "n": 303
+    }
+   },
+   "regionSig": false
+  },
+  {
+   "animal": "Large dog",
+   "total": {
+    "beat": 23,
+    "not": 58,
+    "dk": 19,
+    "n": 1224
+   },
+   "gender": {
+    "Male": {
+     "beat": 31,
+     "not": 49,
+     "dk": 20,
+     "n": 587
+    },
+    "Female": {
+     "beat": 15,
+     "not": 67,
+     "dk": 18,
+     "n": 637
+    }
+   },
+   "genderSig": true,
+   "age": {
+    "18-34": {
+     "beat": 28,
+     "not": 53,
+     "dk": 18,
+     "n": 435
+    },
+    "35-54": {
+     "beat": 26,
+     "not": 53,
+     "dk": 21,
+     "n": 331
+    },
+    "55+": {
+     "beat": 16,
+     "not": 65,
+     "dk": 18,
+     "n": 458
+    }
+   },
+   "ageSlope": -3.09,
+   "dangerProxy": 58,
+   "region": {
+    "Northeast": {
+     "beat": 20,
+     "not": 61,
+     "dk": 19,
+     "n": 195
+    },
+    "Midwest": {
+     "beat": 22,
+     "not": 61,
+     "dk": 17,
+     "n": 279
+    },
+    "South": {
+     "beat": 23,
+     "not": 57,
+     "dk": 20,
+     "n": 447
+    },
+    "West": {
+     "beat": 25,
+     "not": 56,
+     "dk": 19,
+     "n": 303
+    }
+   },
+   "regionSig": false
+  },
+  {
+   "animal": "Chimpanzee",
+   "total": {
+    "beat": 17,
+    "not": 65,
+    "dk": 19,
+    "n": 1224
+   },
+   "gender": {
+    "Male": {
+     "beat": 22,
+     "not": 59,
+     "dk": 19,
+     "n": 587
+    },
+    "Female": {
+     "beat": 12,
+     "not": 70,
+     "dk": 18,
+     "n": 637
+    }
+   },
+   "genderSig": true,
+   "age": {
+    "18-34": {
+     "beat": 22,
+     "not": 57,
+     "dk": 20,
+     "n": 435
+    },
+    "35-54": {
+     "beat": 14,
+     "not": 65,
+     "dk": 21,
+     "n": 331
+    },
+    "55+": {
+     "beat": 14,
+     "not": 71,
+     "dk": 15,
+     "n": 458
+    }
+   },
+   "ageSlope": -2.03,
+   "dangerProxy": 65,
+   "region": {
+    "Northeast": {
+     "beat": 18,
+     "not": 66,
+     "dk": 15,
+     "n": 195
+    },
+    "Midwest": {
+     "beat": 13,
+     "not": 70,
+     "dk": 17,
+     "n": 279
+    },
+    "South": {
+     "beat": 19,
+     "not": 61,
+     "dk": 20,
+     "n": 447
+    },
+    "West": {
+     "beat": 16,
+     "not": 64,
+     "dk": 20,
+     "n": 303
+    }
+   },
+   "regionSig": false
+  },
+  {
+   "animal": "King Cobra",
+   "total": {
+    "beat": 15,
+    "not": 69,
+    "dk": 15,
+    "n": 1224
+   },
+   "gender": {
+    "Male": {
+     "beat": 23,
+     "not": 58,
+     "dk": 18,
+     "n": 587
+    },
+    "Female": {
+     "beat": 8,
+     "not": 80,
+     "dk": 12,
+     "n": 637
+    }
+   },
+   "genderSig": true,
+   "age": {
+    "18-34": {
+     "beat": 23,
+     "not": 58,
+     "dk": 19,
+     "n": 435
+    },
+    "35-54": {
+     "beat": 12,
+     "not": 73,
+     "dk": 15,
+     "n": 331
+    },
+    "55+": {
+     "beat": 12,
+     "not": 76,
+     "dk": 12,
+     "n": 458
+    }
+   },
+   "ageSlope": -2.8,
+   "dangerProxy": 69,
+   "region": {
+    "Northeast": {
+     "beat": 13,
+     "not": 73,
+     "dk": 14,
+     "n": 195
+    },
+    "Midwest": {
+     "beat": 11,
+     "not": 76,
+     "dk": 13,
+     "n": 279
+    },
+    "South": {
+     "beat": 18,
+     "not": 65,
+     "dk": 16,
+     "n": 447
+    },
+    "West": {
+     "beat": 17,
+     "not": 67,
+     "dk": 16,
+     "n": 303
+    }
+   },
+   "regionSig": false
+  },
+  {
+   "animal": "Kangaroo",
+   "total": {
+    "beat": 14,
+    "not": 68,
+    "dk": 18,
+    "n": 1224
+   },
+   "gender": {
+    "Male": {
+     "beat": 17,
+     "not": 62,
+     "dk": 21,
+     "n": 587
+    },
+    "Female": {
+     "beat": 11,
+     "not": 74,
+     "dk": 16,
+     "n": 637
+    }
+   },
+   "genderSig": true,
+   "age": {
+    "18-34": {
+     "beat": 22,
+     "not": 60,
+     "dk": 18,
+     "n": 435
+    },
+    "35-54": {
+     "beat": 13,
+     "not": 67,
+     "dk": 20,
+     "n": 331
+    },
+    "55+": {
+     "beat": 8,
+     "not": 75,
+     "dk": 17,
+     "n": 458
+    }
+   },
+   "ageSlope": -3.58,
+   "dangerProxy": 68,
+   "region": {
+    "Northeast": {
+     "beat": 18,
+     "not": 65,
+     "dk": 17,
+     "n": 195
+    },
+    "Midwest": {
+     "beat": 9,
+     "not": 73,
+     "dk": 18,
+     "n": 279
+    },
+    "South": {
+     "beat": 14,
+     "not": 66,
+     "dk": 20,
+     "n": 447
+    },
+    "West": {
+     "beat": 14,
+     "not": 69,
+     "dk": 16,
+     "n": 303
+    }
+   },
+   "regionSig": false
+  },
+  {
+   "animal": "Wolf",
+   "total": {
+    "beat": 12,
+    "not": 75,
+    "dk": 13,
+    "n": 1224
+   },
+   "gender": {
+    "Male": {
+     "beat": 16,
+     "not": 68,
+     "dk": 16,
+     "n": 587
+    },
+    "Female": {
+     "beat": 9,
+     "not": 82,
+     "dk": 10,
+     "n": 637
+    }
+   },
+   "genderSig": true,
+   "age": {
+    "18-34": {
+     "beat": 17,
+     "not": 67,
+     "dk": 16,
+     "n": 435
+    },
+    "35-54": {
+     "beat": 13,
+     "not": 74,
+     "dk": 13,
+     "n": 331
+    },
+    "55+": {
+     "beat": 8,
+     "not": 82,
+     "dk": 10,
+     "n": 458
+    }
+   },
+   "ageSlope": -2.31,
+   "dangerProxy": 75,
+   "region": {
+    "Northeast": {
+     "beat": 9,
+     "not": 77,
+     "dk": 14,
+     "n": 195
+    },
+    "Midwest": {
+     "beat": 9,
+     "not": 78,
+     "dk": 12,
+     "n": 279
+    },
+    "South": {
+     "beat": 13,
+     "not": 74,
+     "dk": 13,
+     "n": 447
+    },
+    "West": {
+     "beat": 16,
+     "not": 71,
+     "dk": 13,
+     "n": 303
+    }
+   },
+   "regionSig": false
+  },
+  {
+   "animal": "Crocodile",
+   "total": {
+    "beat": 9,
+    "not": 79,
+    "dk": 12,
+    "n": 1224
+   },
+   "gender": {
+    "Male": {
+     "beat": 10,
+     "not": 76,
+     "dk": 13,
+     "n": 587
+    },
+    "Female": {
+     "beat": 8,
+     "not": 82,
+     "dk": 10,
+     "n": 637
+    }
+   },
+   "genderSig": false,
+   "age": {
+    "18-34": {
+     "beat": 17,
+     "not": 67,
+     "dk": 16,
+     "n": 435
+    },
+    "35-54": {
+     "beat": 7,
+     "not": 82,
+     "dk": 11,
+     "n": 331
+    },
+    "55+": {
+     "beat": 4,
+     "not": 87,
+     "dk": 8,
+     "n": 458
+    }
+   },
+   "ageSlope": -3.32,
+   "dangerProxy": 79,
+   "region": {
+    "Northeast": {
+     "beat": 7,
+     "not": 81,
+     "dk": 12,
+     "n": 195
+    },
+    "Midwest": {
+     "beat": 5,
+     "not": 86,
+     "dk": 10,
+     "n": 279
+    },
+    "South": {
+     "beat": 11,
+     "not": 77,
+     "dk": 12,
+     "n": 447
+    },
+    "West": {
+     "beat": 12,
+     "not": 76,
+     "dk": 13,
+     "n": 303
+    }
+   },
+   "regionSig": false
+  },
+  {
+   "animal": "Gorilla",
+   "total": {
+    "beat": 8,
+    "not": 83,
+    "dk": 9,
+    "n": 1224
+   },
+   "gender": {
+    "Male": {
+     "beat": 9,
+     "not": 81,
+     "dk": 10,
+     "n": 587
+    },
+    "Female": {
+     "beat": 8,
+     "not": 84,
+     "dk": 8,
+     "n": 637
+    }
+   },
+   "genderSig": false,
+   "age": {
+    "18-34": {
+     "beat": 16,
+     "not": 71,
+     "dk": 13,
+     "n": 435
+    },
+    "35-54": {
+     "beat": 7,
+     "not": 82,
+     "dk": 10,
+     "n": 331
+    },
+    "55+": {
+     "beat": 3,
+     "not": 92,
+     "dk": 5,
+     "n": 458
+    }
+   },
+   "ageSlope": -3.32,
+   "dangerProxy": 83,
+   "region": {
+    "Northeast": {
+     "beat": 8,
+     "not": 83,
+     "dk": 9,
+     "n": 195
+    },
+    "Midwest": {
+     "beat": 5,
+     "not": 88,
+     "dk": 7,
+     "n": 279
+    },
+    "South": {
+     "beat": 10,
+     "not": 80,
+     "dk": 10,
+     "n": 447
+    },
+    "West": {
+     "beat": 8,
+     "not": 83,
+     "dk": 9,
+     "n": 303
+    }
+   },
+   "regionSig": false
+  },
+  {
+   "animal": "Lion",
+   "total": {
+    "beat": 8,
+    "not": 83,
+    "dk": 9,
+    "n": 1224
+   },
+   "gender": {
+    "Male": {
+     "beat": 7,
+     "not": 83,
+     "dk": 10,
+     "n": 587
+    },
+    "Female": {
+     "beat": 8,
+     "not": 84,
+     "dk": 8,
+     "n": 637
+    }
+   },
+   "genderSig": false,
+   "age": {
+    "18-34": {
+     "beat": 13,
+     "not": 72,
+     "dk": 15,
+     "n": 435
+    },
+    "35-54": {
+     "beat": 7,
+     "not": 84,
+     "dk": 9,
+     "n": 331
+    },
+    "55+": {
+     "beat": 4,
+     "not": 92,
+     "dk": 4,
+     "n": 458
+    }
+   },
+   "ageSlope": -2.3,
+   "dangerProxy": 83,
+   "region": {
+    "Northeast": {
+     "beat": 6,
+     "not": 86,
+     "dk": 8,
+     "n": 195
+    },
+    "Midwest": {
+     "beat": 2,
+     "not": 91,
+     "dk": 7,
+     "n": 279
+    },
+    "South": {
+     "beat": 10,
+     "not": 80,
+     "dk": 10,
+     "n": 447
+    },
+    "West": {
+     "beat": 10,
+     "not": 81,
+     "dk": 9,
+     "n": 303
+    }
+   },
+   "regionSig": true
+  },
+  {
+   "animal": "Elephant",
+   "total": {
+    "beat": 8,
+    "not": 82,
+    "dk": 9,
+    "n": 1224
+   },
+   "gender": {
+    "Male": {
+     "beat": 9,
+     "not": 82,
+     "dk": 9,
+     "n": 587
+    },
+    "Female": {
+     "beat": 8,
+     "not": 83,
+     "dk": 10,
+     "n": 637
+    }
+   },
+   "genderSig": false,
+   "age": {
+    "18-34": {
+     "beat": 16,
+     "not": 69,
+     "dk": 14,
+     "n": 435
+    },
+    "35-54": {
+     "beat": 8,
+     "not": 82,
+     "dk": 10,
+     "n": 331
+    },
+    "55+": {
+     "beat": 2,
+     "not": 93,
+     "dk": 5,
+     "n": 458
+    }
+   },
+   "ageSlope": -3.58,
+   "dangerProxy": 82,
+   "region": {
+    "Northeast": {
+     "beat": 6,
+     "not": 84,
+     "dk": 10,
+     "n": 195
+    },
+    "Midwest": {
+     "beat": 6,
+     "not": 87,
+     "dk": 8,
+     "n": 279
+    },
+    "South": {
+     "beat": 9,
+     "not": 80,
+     "dk": 11,
+     "n": 447
+    },
+    "West": {
+     "beat": 11,
+     "not": 81,
+     "dk": 8,
+     "n": 303
+    }
+   },
+   "regionSig": false
+  },
+  {
+   "animal": "Grizzly bear",
+   "total": {
+    "beat": 6,
+    "not": 85,
+    "dk": 9,
+    "n": 1224
+   },
+   "gender": {
+    "Male": {
+     "beat": 7,
+     "not": 84,
+     "dk": 9,
+     "n": 587
+    },
+    "Female": {
+     "beat": 6,
+     "not": 85,
+     "dk": 9,
+     "n": 637
+    }
+   },
+   "genderSig": false,
+   "age": {
+    "18-34": {
+     "beat": 12,
+     "not": 72,
+     "dk": 15,
+     "n": 435
+    },
+    "35-54": {
+     "beat": 5,
+     "not": 86,
+     "dk": 9,
+     "n": 331
+    },
+    "55+": {
+     "beat": 2,
+     "not": 94,
+     "dk": 4,
+     "n": 458
+    }
+   },
+   "ageSlope": -2.55,
+   "dangerProxy": 85,
+   "region": {
+    "Northeast": {
+     "beat": 6,
+     "not": 86,
+     "dk": 9,
+     "n": 195
+    },
+    "Midwest": {
+     "beat": 3,
+     "not": 89,
+     "dk": 8,
+     "n": 279
+    },
+    "South": {
+     "beat": 8,
+     "not": 82,
+     "dk": 10,
+     "n": 447
+    },
+    "West": {
+     "beat": 7,
+     "not": 84,
+     "dk": 9,
+     "n": 303
+    }
+   },
+   "regionSig": false
+  }
+ ]
+};
+const ANIMAL_NAMES = DATA.animals.map(d => d.animal);
+const BY_NAME = Object.fromEntries(DATA.animals.map(d => [d.animal, d]));
+
+// ---------------------------------------------------------------
+// Shared state
+// ---------------------------------------------------------------
+let currentLens = 'total';
+let selected = new Set();
+let searchQuery = '';
+let selectedOnly = false;
+let sigOnly = false;
+let xKey = 'not_total';
+let yKey = 'ageSlope';
+
+// motion is meaningful here (it tells you what just changed), so it also
+// needs to know when to get out of the way — every animated transition
+// in this file goes through dur() rather than a bare .duration(ms)
+function prefersReducedMotion() {
+  return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+function dur(ms) { return prefersReducedMotion() ? 0 : ms; }
+
+const tooltip = document.getElementById('tooltip');
+function showTooltip(html, evt) {
+  tooltip.innerHTML = html;
+  tooltip.classList.add('show');
+  moveTooltip(evt);
+}
+function moveTooltip(evt) {
+  const pad = 14;
+  let x = evt.clientX + pad, y = evt.clientY + pad;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  if (x + 230 > vw) x = evt.clientX - 230 - pad;
+  if (y + 90 > vh) y = evt.clientY - 90 - pad;
+  tooltip.style.left = x + 'px';
+  tooltip.style.top = y + 'px';
+}
+function hideTooltip() { tooltip.classList.remove('show'); }
+
+document.getElementById('sourceLine').textContent = DATA.meta.source;
+
+let lastToggled = null; // drives the chip "pop" confirmation on the next renderChips()
+
+function toggleSelect(name) {
+  const becomingSelected = !selected.has(name);
+  if (selected.has(name)) selected.delete(name); else selected.add(name);
+  lastToggled = becomingSelected ? name : null;
+  renderAll();
+}
+
+// ---------------------------------------------------------------
+// Top-level tabs — the incoming panel materializes (fades + rises)
+// rather than snapping in, so switching views reads as a real place
+// you arrived at, not a hard cut
+// ---------------------------------------------------------------
+function activatePanel(tab) {
+  document.querySelectorAll('.tabs[aria-label="View"] button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active', 'enter', 'enter-active'));
+  const panel = document.getElementById('panel-' + tab);
+  panel.classList.add('active');
+  if (!prefersReducedMotion()) {
+    panel.classList.add('enter');
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      panel.classList.remove('enter');
+      panel.classList.add('enter-active');
+    }));
+  }
+}
+document.querySelectorAll('.tabs[aria-label="View"] button').forEach(btn => {
+  btn.addEventListener('click', () => activatePanel(btn.dataset.tab));
+});
+
+// ---------------------------------------------------------------
+// Control bar: search, chips, quick-select
+// ---------------------------------------------------------------
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', () => {
+  searchQuery = searchInput.value.trim().toLowerCase();
+  renderAll();
+});
+
+document.getElementById('clearSelectionBtn').addEventListener('click', () => {
+  selected.clear();
+  renderAll();
+});
+
+function renderChips() {
+  const wrap = document.getElementById('animalChips');
+  wrap.innerHTML = '';
+  ANIMAL_NAMES.forEach(name => {
+    const btn = document.createElement('button');
+    btn.className = 'chip' + (selected.has(name) ? ' active' : '');
+    if (searchQuery && !name.toLowerCase().includes(searchQuery)) btn.classList.add('dim');
+    if (name === lastToggled && !prefersReducedMotion()) btn.classList.add('pop');
+    btn.textContent = name;
+    btn.addEventListener('click', () => toggleSelect(name));
+    wrap.appendChild(btn);
+  });
+  lastToggled = null;
+  const clearBtn = document.getElementById('clearSelectionBtn');
+  clearBtn.hidden = selected.size === 0;
+  document.getElementById('selCount').textContent = selected.size;
+}
+
+function quickSelect(kind) {
+  const sorted = [...DATA.animals];
+  if (kind === 'top5confident') {
+    selected = new Set(sorted.sort((a, b) => b.total.beat - a.total.beat).slice(0, 5).map(d => d.animal));
+  } else if (kind === 'top5danger') {
+    selected = new Set(sorted.sort((a, b) => b.total.not - a.total.not).slice(0, 5).map(d => d.animal));
+  } else if (kind === 'siggender') {
+    selected = new Set(sorted.filter(d => d.genderSig).map(d => d.animal));
+  } else if (kind === 'sigregion') {
+    selected = new Set(sorted.filter(d => d.regionSig).map(d => d.animal));
+  }
+  activatePanel('compare');
+  renderAll();
+}
+document.querySelectorAll('.quick-select button').forEach(btn => {
+  btn.addEventListener('click', () => quickSelect(btn.dataset.quick));
+});
+
+// ---------------------------------------------------------------
+// Ranking filters
+// ---------------------------------------------------------------
+document.getElementById('selectedOnlyChk').addEventListener('change', function () {
+  selectedOnly = this.checked;
+  renderAll();
+});
+document.getElementById('sigOnlyChk').addEventListener('change', function () {
+  sigOnly = this.checked;
+  renderAll();
+});
+
+function filteredForRanking() {
+  let list = DATA.animals.filter(d => d.animal.toLowerCase().includes(searchQuery));
+  if (selectedOnly) list = list.filter(d => selected.has(d.animal));
+  if (sigOnly && (currentLens === 'gender' || currentLens === 'region')) {
+    const key = currentLens === 'gender' ? 'genderSig' : 'regionSig';
+    list = list.filter(d => d[key]);
+  }
+  return list;
+}
+
+// ---------------------------------------------------------------
+// Lens config (shared by Ranking and Compare)
+// ---------------------------------------------------------------
+const LENS_CONFIG = {
+  total: {
+    title: 'Who thinks they’d win?',
+    sub: 'Share of respondents who think they could beat each animal unarmed, ranked from most to least confident.',
+    groups: [{ key: null, color: 'var(--beat)', label: null }],
+    recKey: null,
+  },
+  gender: {
+    title: 'Does the gender gap hold up?',
+    sub: 'Filled dot = the gap survives a Holm-corrected significance test across all 15 animals.',
+    groups: [
+      { key: 'Male', color: 'var(--male)', label: 'Men' },
+      { key: 'Female', color: 'var(--female)', label: 'Women' },
+    ],
+    recKey: 'gender',
+  },
+  age: {
+    title: 'Confidence by age group',
+    sub: 'Younger respondents are relatively more confident against the most dangerous animals — see the Explore tab.',
+    groups: [
+      { key: '18-34', color: 'var(--age1)', label: '18–34' },
+      { key: '35-54', color: 'var(--age2)', label: '35–54' },
+      { key: '55+', color: 'var(--age3)', label: '55+' },
+    ],
+    recKey: 'age',
+  },
+  region: {
+    title: 'Confidence by US region',
+    sub: 'The weakest of the three dimensions — only one animal (see filled dot) shows a statistically real regional difference.',
+    groups: [
+      { key: 'Northeast', color: 'var(--ne)', label: 'Northeast' },
+      { key: 'Midwest', color: 'var(--mw)', label: 'Midwest' },
+      { key: 'South', color: 'var(--so)', label: 'South' },
+      { key: 'West', color: 'var(--we)', label: 'West' },
+    ],
+    recKey: 'region',
+  },
+};
+
+function recFor(d, lensKey, groupKey) {
+  if (groupKey === null) return d.total;
+  return d[LENS_CONFIG[lensKey].recKey][groupKey];
+}
+
+// ---------------------------------------------------------------
+// Generic grouped/stacked bar-chart renderer
+// used by both the Ranking panel (one lens at a time, full width)
+// and the Compare panel (all four lenses, compact, selected-only)
+// ---------------------------------------------------------------
+function renderGroupedBars(svgEl, animals, lensKey, opts) {
+  opts = opts || {};
+  const compact = !!opts.compact;
+  const showDot = !!opts.dot && (lensKey === 'gender' || lensKey === 'region');
+  const cfg = LENS_CONFIG[lensKey];
+  const svg = d3.select(svgEl);
+  svg.selectAll('*').remove();
+
+  const n = animals.length;
+  const width = compact ? 720 : 780;
+  if (n === 0) {
+    svg.attr('viewBox', `0 0 ${width} 60`);
+    svg.append('text').attr('class', 'axis-label').attr('x', width / 2).attr('y', 32)
+      .attr('text-anchor', 'middle').text('No animals match the current filter.');
+    return;
+  }
+
+  const rowH = compact
+    ? (cfg.groups.length > 1 ? 11 * cfg.groups.length + 8 : 22)
+    : (cfg.groups.length > 1 ? 15 * cfg.groups.length + 10 : 26);
+  const margin = {
+    top: 6, right: 40,
+    bottom: 22,
+    left: showDot ? (compact ? 150 : 186) : (compact ? 96 : 118),
+  };
+  const height = n * rowH + margin.top + margin.bottom;
+  svg.attr('viewBox', `0 0 ${width} ${height}`);
+
+  const x = d3.scaleLinear().domain([0, 100]).range([margin.left, width - margin.right]);
+  const y = d3.scaleBand().domain(animals.map(d => d.animal))
+    .range([margin.top, height - margin.bottom]).paddingInner(0.28);
+
+  const g = svg.append('g');
+
+  g.append('g').attr('class', 'grid')
+    .selectAll('line').data(x.ticks(5)).join('line')
+    .attr('x1', d => x(d)).attr('x2', d => x(d))
+    .attr('y1', margin.top).attr('y2', height - margin.bottom);
+
+  g.append('g').selectAll('text.axis-label')
+    .data(x.ticks(5)).join('text')
+    .attr('class', 'axis-label')
+    .attr('x', d => x(d)).attr('y', height - margin.bottom + 16)
+    .attr('text-anchor', 'middle')
+    .text(d => d + '%');
+
+  g.append('line').attr('class', 'baseline')
+    .attr('x1', margin.left).attr('x2', margin.left)
+    .attr('y1', margin.top).attr('y2', height - margin.bottom);
+
+  const rows = g.selectAll('g.row')
+    .data(animals).join('g')
+    .attr('class', 'row')
+    .attr('transform', d => `translate(0, ${y(d.animal)})`);
+
+  rows.append('text').attr('class', 'animal-label')
+    .attr('x', margin.left - 10).attr('y', y.bandwidth() / 2)
+    .attr('dy', '0.35em').attr('text-anchor', 'end')
+    .text(d => d.animal)
+    .on('click', (evt, d) => toggleSelect(d.animal));
+
+  if (showDot) {
+    const sigKey = lensKey === 'gender' ? 'genderSig' : 'regionSig';
+    rows.append('circle')
+      .attr('class', d => 'sig-dot' + (d[sigKey] ? '' : ' off'))
+      .attr('cx', 18).attr('cy', y.bandwidth() / 2)
+      .attr('r', 3.2)
+      .on('mouseenter', (evt, d) => showTooltip(
+        `<b>${d.animal}</b><div>${d[sigKey] ? 'Statistically significant' : 'Not statistically significant'} (Holm-corrected)</div>`, evt))
+      .on('mousemove', moveTooltip)
+      .on('mouseleave', hideTooltip);
+  }
+
+  const dim = d => selected.size > 0 && !selected.has(d.animal);
+
+  if (cfg.groups.length === 1) {
+    const segs = [
+      { key: 'beat', color: opts.beatColor || 'var(--beat)' },
+      { key: 'not', color: 'var(--not)' },
+      { key: 'dk', color: 'var(--dk)' },
+    ];
+    rows.each(function (d, i) {
+      const row = d3.select(this);
+      const delay = Math.min(i * 14, 220);
+      let acc = 0;
+      segs.forEach(seg => {
+        const v = d.total[seg.key];
+        const w = Math.max(0, x(acc + v) - x(acc));
+        row.append('rect')
+          .attr('class', 'bar-seg' + (dim(d) ? ' dimmed' : '') + (selected.has(d.animal) && !compact ? ' picked' : ''))
+          .attr('x', x(acc)).attr('y', 0)
+          .attr('width', 0).attr('height', y.bandwidth())
+          .attr('rx', 3)
+          .attr('fill', seg.color)
+          .style('opacity', dim(d) ? 0.32 : 1)
+          .transition().delay(dur(delay)).duration(dur(420)).ease(d3.easeCubicOut)
+          .attr('width', w);
+        acc += v;
+      });
+      row.append('rect')
+        .attr('class', 'bar-hit')
+        .attr('x', x(0)).attr('y', 0)
+        .attr('width', x(100) - x(0)).attr('height', y.bandwidth())
+        .on('mouseenter', evt => showTooltip(
+          `<b>${d.animal}</b>
+           <div class="row"><span>Could beat</span><span>${d.total.beat}%</span></div>
+           <div class="row"><span>Could not beat</span><span>${d.total.not}%</span></div>
+           <div class="row"><span>Don't know</span><span>${d.total.dk}%</span></div>
+           <div class="n">n = ${d.total.n}</div>
+           <div class="hint">Click to ${selected.has(d.animal) ? 'remove from' : 'add to'} comparison</div>`, evt))
+        .on('mousemove', moveTooltip)
+        .on('mouseleave', hideTooltip)
+        .on('click', () => toggleSelect(d.animal));
+    });
+  } else {
+    const groups = cfg.groups;
+    const gh = (y.bandwidth() - 4) / groups.length;
+    rows.each(function (d, rowIdx) {
+      const row = d3.select(this);
+      const delay = Math.min(rowIdx * 14, 220);
+      groups.forEach((grp, i) => {
+        const rec = recFor(d, lensKey, grp.key);
+        const w = Math.max(0, x(rec.beat) - x(0));
+        row.append('rect')
+          .attr('class', 'bar-seg' + (dim(d) ? ' dimmed' : '') + (selected.has(d.animal) && !compact ? ' picked' : ''))
+          .attr('x', x(0)).attr('y', i * gh)
+          .attr('width', 0).attr('height', gh - 2)
+          .attr('rx', 2.5)
+          .attr('fill', grp.color)
+          .style('opacity', dim(d) ? 0.32 : 1)
+          .transition().delay(dur(delay + i * 30)).duration(dur(380)).ease(d3.easeCubicOut)
+          .attr('width', w);
+        row.append('rect')
+          .attr('class', 'bar-hit')
+          .attr('x', x(0)).attr('y', i * gh)
+          .attr('width', x(100) - x(0)).attr('height', gh - 2)
+          .on('mouseenter', evt => showTooltip(
+            `<b>${d.animal} — ${grp.label}</b>
+             <div class="row"><span>Could beat</span><span>${rec.beat}%</span></div>
+             <div class="row"><span>Could not beat</span><span>${rec.not}%</span></div>
+             <div class="row"><span>Don't know</span><span>${rec.dk}%</span></div>
+             <div class="n">n = ${rec.n}</div>
+             <div class="hint">Click to ${selected.has(d.animal) ? 'remove from' : 'add to'} comparison</div>`, evt))
+          .on('mousemove', moveTooltip)
+          .on('mouseleave', hideTooltip)
+          .on('click', () => toggleSelect(d.animal));
+      });
+    });
+  }
+}
+
+function renderLegendInto(container, cfg, beatColor) {
+  container.innerHTML = '';
+  const items = cfg.groups.length === 1
+    ? [{ color: beatColor || 'var(--beat)', label: 'Could beat' }, { color: 'var(--not)', label: 'Could not beat' }, { color: 'var(--dk)', label: "Don't know" }]
+    : cfg.groups.map(g => ({ color: g.color, label: g.label }));
+  items.forEach(it => {
+    const el = document.createElement('div');
+    el.className = 'item';
+    el.innerHTML = `<span class="swatch" style="background:${it.color}"></span>${it.label}`;
+    container.appendChild(el);
+  });
+}
+
+function renderRankingTable(cfg, animals) {
+  const wrap = document.getElementById('rankingTableWrap');
+  const groups = cfg.groups.length === 1 ? [{ key: null, label: 'Total' }] : cfg.groups;
+  let html = '<table class="data-table"><thead><tr><th>Animal</th>';
+  groups.forEach(g => { html += `<th>${g.label} could beat</th>`; });
+  html += '<th>n</th></tr></thead><tbody>';
+  animals.forEach(d => {
+    html += `<tr><td>${d.animal}</td>`;
+    groups.forEach(g => {
+      const rec = g.key === null ? d.total : recFor(d, currentLens, g.key);
+      html += `<td>${rec.beat}%</td>`;
+    });
+    const nRef = g => g.key === null ? d.total.n : recFor(d, currentLens, g.key).n;
+    html += `<td>${groups.map(nRef).join(' / ')}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+function renderRanking() {
+  const cfg = LENS_CONFIG[currentLens];
+  document.getElementById('chartTitle').textContent = cfg.title;
+  document.getElementById('chartSub').textContent = cfg.sub;
+  document.getElementById('sigOnlyWrap').hidden = !(currentLens === 'gender' || currentLens === 'region');
+
+  const animals = filteredForRanking();
+  renderGroupedBars(document.getElementById('rankingSvg'), animals, currentLens, { dot: true });
+  renderLegendInto(document.getElementById('rankingLegend'), cfg);
+
+  const note = document.getElementById('rankingLegendNote');
+  if (currentLens === 'gender' || currentLens === 'region') {
+    note.hidden = false;
+    note.innerHTML = `<svg width="11" height="11" viewBox="0 0 11 11"><circle cx="5.5" cy="5.5" r="3.2" fill="var(--sig-dot)"></circle></svg><span>= statistically significant gap (Holm-corrected, p&lt;.05)</span>`;
+  } else {
+    note.hidden = true;
+  }
+  renderRankingTable(cfg, animals);
+}
+
+document.querySelectorAll('.tabs.lens button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tabs.lens button').forEach(b => b.setAttribute('aria-selected', 'false'));
+    btn.setAttribute('aria-selected', 'true');
+    currentLens = btn.dataset.lens;
+    renderRanking();
+  });
+});
+
+document.getElementById('rankingTableToggle').addEventListener('click', function () {
+  const wrap = document.getElementById('rankingTableWrap');
+  wrap.hidden = !wrap.hidden;
+  this.textContent = wrap.hidden ? 'View as table' : 'Hide table';
+});
+
+// ---------------------------------------------------------------
+// Explore tab — build-your-own correlation scatter
+// ---------------------------------------------------------------
+const METRICS = [
+  { key: 'not_total',    label: 'Danger proxy — could not beat, total (%)' },
+  { key: 'beat_total',   label: 'Total confidence — could beat (%)' },
+  { key: 'ageSlope',     label: 'Age slope (pp confidence per +10 yrs)' },
+  { key: 'genderGap',    label: 'Gender gap: Men − Women (pp)' },
+  { key: 'ageGap',       label: 'Age gap: 18–34 − 55+ (pp)' },
+  { key: 'regionSpread', label: 'Region spread: max − min (pp)' },
+  { key: 'beat_male',    label: 'Men could beat (%)' },
+  { key: 'beat_female',  label: 'Women could beat (%)' },
+  { key: 'beat_1834',    label: '18–34 could beat (%)' },
+  { key: 'beat_55plus',  label: '55+ could beat (%)' },
+];
+const METRIC_LABEL = Object.fromEntries(METRICS.map(m => [m.key, m.label]));
+
+function metricValue(d, key) {
+  switch (key) {
+    case 'beat_total': return d.total.beat;
+    case 'not_total': return d.total.not;
+    case 'ageSlope': return d.ageSlope;
+    case 'genderGap': return d.gender.Male.beat - d.gender.Female.beat;
+    case 'ageGap': return d.age['18-34'].beat - d.age['55+'].beat;
+    case 'regionSpread': {
+      const vals = Object.values(d.region).map(r => r.beat);
+      return Math.max(...vals) - Math.min(...vals);
+    }
+    case 'beat_male': return d.gender.Male.beat;
+    case 'beat_female': return d.gender.Female.beat;
+    case 'beat_1834': return d.age['18-34'].beat;
+    case 'beat_55plus': return d.age['55+'].beat;
+    default: return 0;
+  }
+}
+
+function pearson(xs, ys) {
+  const n = xs.length;
+  const mx = d3.mean(xs), my = d3.mean(ys);
+  let sxy = 0, sxx = 0, syy = 0;
+  for (let i = 0; i < n; i++) {
+    const dx = xs[i] - mx, dy = ys[i] - my;
+    sxy += dx * dy; sxx += dx * dx; syy += dy * dy;
+  }
+  return sxy / Math.sqrt(sxx * syy);
+}
+function linreg(xs, ys) {
+  const n = xs.length;
+  const mx = d3.mean(xs), my = d3.mean(ys);
+  let sxy = 0, sxx = 0;
+  for (let i = 0; i < n; i++) {
+    const dx = xs[i] - mx;
+    sxy += dx * (ys[i] - my); sxx += dx * dx;
+  }
+  const slope = sxx === 0 ? 0 : sxy / sxx;
+  const intercept = my - slope * mx;
+  return { slope, intercept };
+}
+
+const xSelect = document.getElementById('xSelect');
+const ySelect = document.getElementById('ySelect');
+METRICS.forEach(m => {
+  xSelect.appendChild(new Option(m.label, m.key));
+  ySelect.appendChild(new Option(m.label, m.key));
+});
+xSelect.value = xKey;
+ySelect.value = yKey;
+xSelect.addEventListener('change', () => { xKey = xSelect.value; renderExplore(); });
+ySelect.addEventListener('change', () => { yKey = ySelect.value; renderExplore(); });
+document.getElementById('swapAxes').addEventListener('click', () => {
+  [xKey, yKey] = [yKey, xKey];
+  xSelect.value = xKey; ySelect.value = yKey;
+  renderExplore();
+});
+
+function renderExplore() {
+  const animals = DATA.animals.filter(d => d.animal.toLowerCase().includes(searchQuery));
+  document.getElementById('exploreTitle').textContent = `${METRIC_LABEL[yKey]} vs. ${METRIC_LABEL[xKey]}`;
+
+  const xs = animals.map(d => metricValue(d, xKey));
+  const ys = animals.map(d => metricValue(d, yKey));
+
+  const isHeadlinePair = (xKey === 'not_total' && yKey === 'ageSlope');
+  if (isHeadlinePair) {
+    const { r, p } = DATA.meta.ageCorr;
+    document.getElementById('corrNote').innerHTML =
+      `Spearman <b>r = ${r}</b>, <b>p = ${p}</b> (pre-registered, Holm-independent) — the more dangerous the
+       animal, the more age skews younger respondents toward overconfidence.`;
+  } else if (animals.length >= 3) {
+    const r = pearson(xs, ys);
+    document.getElementById('corrNote').innerHTML =
+      `Pearson <b>r = ${r.toFixed(2)}</b> across <b>n = ${animals.length}</b> animals (exploratory — not significance-tested).`;
+  } else {
+    document.getElementById('corrNote').innerHTML = `Select at least 3 animals to compute a correlation.`;
+  }
+
+  const svg = d3.select('#scatterSvg');
+  svg.selectAll('*').remove();
+  const width = 780, height = 520;
+  const margin = { top: 34, right: 24, bottom: 44, left: 50 };
+  svg.attr('viewBox', `0 0 ${width} ${height}`);
+
+  if (animals.length === 0) {
+    svg.attr('viewBox', `0 0 ${width} 80`);
+    svg.append('text').attr('class', 'axis-label').attr('x', width / 2).attr('y', 40)
+      .attr('text-anchor', 'middle').text('No animals match the current filter.');
+    return renderScatterTable(animals);
+  }
+
+  const xExt = d3.extent(xs), yExt = d3.extent(ys);
+  const xPad = Math.max(1, (xExt[1] - xExt[0]) * 0.12 || 4);
+  const yPad = Math.max(1, (yExt[1] - yExt[0]) * 0.12 || 4);
+  const x = d3.scaleLinear().domain([xExt[0] - xPad, xExt[1] + xPad]).range([margin.left, width - margin.right]);
+  const y = d3.scaleLinear().domain([yExt[0] - yPad, yExt[1] + yPad]).range([height - margin.bottom, margin.top]);
+
+  const g = svg.append('g');
+
+  g.append('g').attr('class', 'grid')
+    .selectAll('line').data(x.ticks(6)).join('line')
+    .attr('x1', d => x(d)).attr('x2', d => x(d))
+    .attr('y1', margin.top).attr('y2', height - margin.bottom);
+  g.append('g').selectAll('text.axis-label')
+    .data(x.ticks(6)).join('text').attr('class', 'axis-label')
+    .attr('x', d => x(d)).attr('y', height - margin.bottom + 16)
+    .attr('text-anchor', 'middle').text(d => d3.format('~s')(d));
+  g.append('text').attr('class', 'axis-label')
+    .attr('x', width - margin.right).attr('y', height - 8)
+    .attr('text-anchor', 'end')
+    .text(METRIC_LABEL[xKey]);
+
+  g.append('g').selectAll('text.axis-label-y')
+    .data(y.ticks(6)).join('text').attr('class', 'axis-label')
+    .attr('x', margin.left - 8).attr('y', d => y(d))
+    .attr('dy', '0.32em').attr('text-anchor', 'end').text(d => d3.format('~s')(d));
+  g.append('g').attr('class', 'grid')
+    .selectAll('line.hy').data(y.ticks(6)).join('line')
+    .attr('x1', margin.left).attr('x2', width - margin.right)
+    .attr('y1', d => y(d)).attr('y2', d => y(d));
+
+  if (yExt[0] < 0 && yExt[1] > 0) {
+    g.append('line').attr('stroke', 'var(--baseline)')
+      .attr('x1', margin.left).attr('x2', width - margin.right)
+      .attr('y1', y(0)).attr('y2', y(0));
+  }
+
+  g.append('text').attr('class', 'axis-label')
+    .attr('x', margin.left).attr('y', margin.top - 16)
+    .attr('text-anchor', 'start')
+    .text('↑ ' + METRIC_LABEL[yKey]);
+
+  if (animals.length >= 3) {
+    const { slope, intercept } = linreg(xs, ys);
+    const [x0, x1] = x.domain();
+    g.append('line').attr('class', 'fit-line')
+      .attr('x1', x(x0)).attr('y1', y(slope * x0 + intercept))
+      .attr('x2', x(x1)).attr('y2', y(slope * x1 + intercept));
+  }
+
+  const pts = g.selectAll('g.pt').data(animals).join('g').attr('class', 'pt');
+  pts.append('circle')
+    .attr('class', d => 'scatter-point' + (selected.has(d.animal) ? ' picked' : '') + (selected.size > 0 && !selected.has(d.animal) ? ' dimmed' : ''))
+    .attr('cx', d => x(metricValue(d, xKey))).attr('cy', d => y(metricValue(d, yKey)))
+    .attr('r', 0)
+    .style('opacity', d => selected.size > 0 && !selected.has(d.animal) ? 0.32 : 1)
+    .transition().delay((d, i) => dur(Math.min(i * 16, 240))).duration(dur(360)).ease(d3.easeBackOut.overshoot(1.6))
+    .attr('r', d => selected.has(d.animal) ? 6.5 : 5)
+    .selection()
+    .on('mouseenter', (evt, d) => showTooltip(
+      `<b>${d.animal}</b>
+       <div class="row"><span>${METRIC_LABEL[xKey]}</span><span>${metricValue(d, xKey)}</span></div>
+       <div class="row"><span>${METRIC_LABEL[yKey]}</span><span>${metricValue(d, yKey)}</span></div>
+       <div class="hint">Click to ${selected.has(d.animal) ? 'remove from' : 'add to'} comparison</div>`, evt))
+    .on('mousemove', moveTooltip)
+    .on('mouseleave', hideTooltip)
+    .on('click', (evt, d) => toggleSelect(d.animal));
+
+  // lightweight greedy label-collision avoidance: try a few offset
+  // candidates per point and keep the first that doesn't overlap an
+  // already-placed label's approximate bounding box
+  const candidates = [[8, -8], [8, 14], [-10, -8], [-10, 16], [8, 26], [-10, -20]];
+  const placed = [];
+  const labelOffset = new Map();
+  [...animals].sort((a, b) => x(metricValue(a, xKey)) - x(metricValue(b, xKey))).forEach(d => {
+    const px = x(metricValue(d, xKey)), py = y(metricValue(d, yKey));
+    const w = d.animal.length * 5.6 + 6, h = 13;
+    let chosen = candidates[0];
+    for (const [dx, dy] of candidates) {
+      const bx = px + dx - (dx < 0 ? w : 0), by = py + dy - h + 3;
+      const overlaps = placed.some(b => bx < b.x + b.w && bx + w > b.x && by < b.y + b.h && by + h > b.y);
+      if (!overlaps) { chosen = [dx, dy]; break; }
+    }
+    const bx = px + chosen[0] - (chosen[0] < 0 ? w : 0), by = py + chosen[1] - h + 3;
+    placed.push({ x: bx, y: by, w, h });
+    labelOffset.set(d.animal, chosen);
+  });
+
+  pts.append('text').attr('class', 'scatter-label')
+    .attr('x', d => x(metricValue(d, xKey)) + labelOffset.get(d.animal)[0])
+    .attr('y', d => y(metricValue(d, yKey)) + labelOffset.get(d.animal)[1])
+    .text(d => d.animal)
+    .on('click', (evt, d) => toggleSelect(d.animal));
+
+  renderScatterTable(animals);
+}
+
+function renderScatterTable(animals) {
+  const wrap = document.getElementById('scatterTableWrap');
+  let html = `<table class="data-table"><thead><tr><th>Animal</th><th>${METRIC_LABEL[xKey]}</th><th>${METRIC_LABEL[yKey]}</th></tr></thead><tbody>`;
+  [...animals].sort((a, b) => metricValue(b, yKey) - metricValue(a, yKey)).forEach(d => {
+    html += `<tr><td>${d.animal}</td><td>${metricValue(d, xKey)}</td><td>${metricValue(d, yKey)}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+document.getElementById('scatterTableToggle').addEventListener('click', function () {
+  const wrap = document.getElementById('scatterTableWrap');
+  wrap.hidden = !wrap.hidden;
+  this.textContent = wrap.hidden ? 'View as table' : 'Hide table';
+});
+
+// ---------------------------------------------------------------
+// Compare tab
+// ---------------------------------------------------------------
+function renderCompare() {
+  const chosen = DATA.animals.filter(d => selected.has(d.animal));
+  const empty = document.getElementById('compareEmpty');
+  const content = document.getElementById('compareContent');
+
+  if (chosen.length < 2) {
+    empty.hidden = false;
+    content.hidden = true;
+    return;
+  }
+  empty.hidden = true;
+  content.hidden = false;
+
+  const sorted = [...chosen].sort((a, b) => b.total.beat - a.total.beat);
+
+  const htEl = document.getElementById('headToHead');
+  if (sorted.length === 2) {
+    const [a, b] = sorted;
+    const diff = a.total.beat - b.total.beat;
+    htEl.hidden = false;
+    htEl.innerHTML =
+      `<b>${a.animal}</b> beats <b>${b.animal}</b> ${diff}pp on overall confidence
+       (${a.total.beat}% vs. ${b.total.beat}% say they could win).
+       Danger proxy: <b>${a.animal}</b> ${a.total.not}% vs. <b>${b.animal}</b> ${b.total.not}%.
+       Age slope: <b>${a.animal}</b> ${a.ageSlope} pp/decade vs. <b>${b.animal}</b> ${b.ageSlope} pp/decade.`;
+  } else if (sorted.length > 2) {
+    const most = sorted[0], least = sorted[sorted.length - 1];
+    htEl.hidden = false;
+    htEl.innerHTML =
+      `Comparing <b>${sorted.length}</b> animals — most confidence-inspiring: <b>${most.animal}</b> (${most.total.beat}%);
+       least: <b>${least.animal}</b> (${least.total.beat}%).`;
+  } else {
+    htEl.hidden = true;
+  }
+
+  const lenses = [
+    { key: 'total', svg: 'cmpSvgTotal', legend: 'cmpLegendTotal' },
+    { key: 'gender', svg: 'cmpSvgGender', legend: 'cmpLegendGender' },
+    { key: 'age', svg: 'cmpSvgAge', legend: 'cmpLegendAge' },
+    { key: 'region', svg: 'cmpSvgRegion', legend: 'cmpLegendRegion' },
+  ];
+  lenses.forEach(l => {
+    renderGroupedBars(document.getElementById(l.svg), sorted, l.key, { compact: true, dot: l.key === 'gender' || l.key === 'region' });
+    renderLegendInto(document.getElementById(l.legend), LENS_CONFIG[l.key]);
+  });
+}
+
+// ---------------------------------------------------------------
+// Hero stat strip
+// ---------------------------------------------------------------
+function renderStatStrip() {
+  const byBeat = [...DATA.animals].sort((a, b) => b.total.beat - a.total.beat);
+  const mostFeared = byBeat[byBeat.length - 1];
+  const mostConfident = byBeat[0];
+  const { r, p } = DATA.meta.ageCorr;
+  const stats = [
+    { num: `${mostConfident.total.beat}%`, lbl: `would take on a ${mostConfident.animal.toLowerCase()}` },
+    { num: `${mostFeared.total.beat}%`, lbl: `would take on a ${mostFeared.animal.toLowerCase()} — the least of any animal` },
+    { num: `r = ${r}`, lbl: `correlation between an animal's danger and how much younger people overrate their odds (p = ${p})` },
+  ];
+  const wrap = document.getElementById('statStrip');
+  wrap.innerHTML = '';
+  stats.forEach(s => {
+    const el = document.createElement('div');
+    el.className = 'stat';
+    el.innerHTML = `<span class="num">${s.num}</span><span class="lbl">${s.lbl}</span>`;
+    wrap.appendChild(el);
+  });
+}
+
+// ---------------------------------------------------------------
+// Map tab — US tile-grid cartogram. The survey only reports
+// region-level confidence (not per-state), so states of the same
+// region are fused into one seamless shape — no internal borders,
+// one click target, one hover — while a border is drawn only where
+// the region actually changes. State abbreviations stay as texture
+// (this is what the region is made of) without implying they're
+// separately clickable.
+// ---------------------------------------------------------------
+const REGIONS = [
+  { key: 'West', color: 'var(--we)' },
+  { key: 'Midwest', color: 'var(--mw)' },
+  { key: 'Northeast', color: 'var(--ne)' },
+  { key: 'South', color: 'var(--so)' },
+];
+const REGION_COLOR = Object.fromEntries(REGIONS.map(r => [r.key, r.color]));
+let activeRegion = null;
+
+// [abbr, full name, col, row, region] — col/row on a 12x8 grid, laid out
+// in true relative US geography (Alaska/Hawaii inset, New England fanned
+// out top-right) so the grid reads as "a map", not a random tile sheet.
+const STATE_GRID = [
+  ['AK','Alaska',0,0,'West'], ['ME','Maine',11,0,'Northeast'],
+  ['VT','Vermont',10,1,'Northeast'], ['NH','New Hampshire',11,1,'Northeast'],
+  ['WA','Washington',1,2,'West'], ['ID','Idaho',2,2,'West'], ['MT','Montana',3,2,'West'],
+  ['ND','North Dakota',4,2,'Midwest'], ['MN','Minnesota',5,2,'Midwest'], ['WI','Wisconsin',6,2,'Midwest'],
+  ['MI','Michigan',7,2,'Midwest'], ['NY','New York',9,2,'Northeast'], ['MA','Massachusetts',10,2,'Northeast'],
+  ['RI','Rhode Island',11,2,'Northeast'],
+  ['OR','Oregon',1,3,'West'], ['NV','Nevada',2,3,'West'], ['WY','Wyoming',3,3,'West'],
+  ['SD','South Dakota',4,3,'Midwest'], ['IA','Iowa',5,3,'Midwest'], ['IL','Illinois',6,3,'Midwest'],
+  ['IN','Indiana',7,3,'Midwest'], ['OH','Ohio',8,3,'Midwest'], ['PA','Pennsylvania',9,3,'Northeast'],
+  ['NJ','New Jersey',10,3,'Northeast'], ['CT','Connecticut',11,3,'Northeast'],
+  ['CA','California',1,4,'West'], ['UT','Utah',2,4,'West'], ['CO','Colorado',3,4,'West'],
+  ['NE','Nebraska',4,4,'Midwest'], ['MO','Missouri',5,4,'Midwest'], ['KY','Kentucky',6,4,'South'],
+  ['WV','West Virginia',7,4,'South'], ['VA','Virginia',8,4,'South'], ['MD','Maryland',9,4,'South'],
+  ['DE','Delaware',10,4,'South'],
+  ['AZ','Arizona',2,5,'West'], ['NM','New Mexico',3,5,'West'], ['KS','Kansas',4,5,'Midwest'],
+  ['AR','Arkansas',5,5,'South'], ['TN','Tennessee',6,5,'South'], ['NC','North Carolina',7,5,'South'],
+  ['SC','South Carolina',8,5,'South'], ['DC','D.C.',9,5,'South'],
+  ['HI','Hawaii',0,6,'West'], ['OK','Oklahoma',3,6,'South'], ['LA','Louisiana',4,6,'South'],
+  ['MS','Mississippi',5,6,'South'], ['AL','Alabama',6,6,'South'], ['GA','Georgia',7,6,'South'],
+  ['TX','Texas',3,7,'South'], ['FL','Florida',7,7,'South'],
+];
+
+// The tiles are built once and then only have their classes toggled —
+// so the opacity/stroke CSS transitions on .map-region have something
+// persistent to animate between, and the clicked tile itself can pop.
+let mapBuilt = false;
+function buildMap() {
+  const svg = d3.select('#usMap');
+  const cell = 40, pad = 6;
+  svg.attr('viewBox', `0 0 ${12 * cell + pad * 2} ${8 * cell + pad * 2}`);
+
+  // grid lookup so every cell knows what's next to it — that's what
+  // decides whether a border is drawn on a given side
+  const byPos = new Map(STATE_GRID.map(s => [`${s[2]},${s[3]}`, s[4]]));
+  const sameRegion = (col, row, region) => byPos.get(`${col},${row}`) === region;
+
+  const g = svg.append('g');
+
+  // 1. fills first, edge-to-edge, no gaps, no per-tile stroke — same-region
+  // neighbors read as one continuous shape purely because they touch and match
+  STATE_GRID.forEach(([abbr, name, col, row, region]) => {
+    const tx = pad + col * cell, ty = pad + row * cell;
+    g.append('rect')
+      .attr('class', 'map-region')
+      .attr('data-region', region)
+      .attr('tabindex', 0)
+      .attr('role', 'button')
+      .attr('aria-label', `${region} region`)
+      .attr('x', tx).attr('y', ty)
+      .attr('width', cell).attr('height', cell)
+      .attr('fill', REGION_COLOR[region])
+      .on('click', function () {
+        const becomingActive = activeRegion !== region;
+        activeRegion = becomingActive ? region : null;
+        if (becomingActive && !prefersReducedMotion()) {
+          d3.select('#usMap').selectAll(`rect.map-region[data-region="${region}"]`).each(function () {
+            this.classList.add('pop');
+            this.addEventListener('animationend', () => this.classList.remove('pop'), { once: true });
+          });
+        }
+        renderMapPanel();
+      })
+      .on('keydown', function (evt) {
+        if (evt.key === 'Enter' || evt.key === ' ') { evt.preventDefault(); this.dispatchEvent(new Event('click')); }
+      })
+      .on('mouseenter', evt => showTooltip(`<b>${region}</b><div class="hint">${name} · click to re-rank by ${region}</div>`, evt))
+      .on('mousemove', moveTooltip)
+      .on('mouseleave', hideTooltip);
+  });
+
+  // 2. borders second, as individual segments, only on sides where the
+  // region actually changes (or the map edge) — this is what makes each
+  // region read as one shape instead of a sheet of separate tiles
+  const borders = g.append('g').attr('class', 'map-borders');
+  STATE_GRID.forEach(([abbr, name, col, row, region]) => {
+    const tx = pad + col * cell, ty = pad + row * cell;
+    const sides = [
+      sameRegion(col, row - 1, region) ? null : [tx, ty, tx + cell, ty],               // top
+      sameRegion(col, row + 1, region) ? null : [tx, ty + cell, tx + cell, ty + cell],  // bottom
+      sameRegion(col - 1, row, region) ? null : [tx, ty, tx, ty + cell],                // left
+      sameRegion(col + 1, row, region) ? null : [tx + cell, ty, tx + cell, ty + cell],  // right
+    ];
+    sides.forEach(s => {
+      if (!s) return;
+      borders.append('line')
+        .attr('class', 'map-border-line')
+        .attr('data-region', region)
+        .attr('x1', s[0]).attr('y1', s[1]).attr('x2', s[2]).attr('y2', s[3]);
+    });
+  });
+
+  // 3. state labels on top, purely informational texture — not separately
+  // interactive (clicks pass through to the fill beneath)
+  STATE_GRID.forEach(([abbr, name, col, row, region]) => {
+    const tx = pad + col * cell, ty = pad + row * cell;
+    g.append('text')
+      .attr('class', 'map-tile-label')
+      .attr('x', tx + cell / 2).attr('y', ty + cell / 2)
+      .attr('text-anchor', 'middle').attr('dy', '0.35em')
+      .style('pointer-events', 'none')
+      .text(abbr);
+  });
+
+  const legend = document.getElementById('mapLegend');
+  legend.innerHTML = '';
+  REGIONS.forEach(r => {
+    const el = document.createElement('div');
+    el.className = 'item';
+    el.innerHTML = `<span class="swatch" style="background:${r.color}"></span>${r.key}`;
+    legend.appendChild(el);
+  });
+  mapBuilt = true;
+}
+
+function renderMap() {
+  if (!mapBuilt) buildMap();
+  d3.select('#usMap').selectAll('rect.map-region').each(function () {
+    const region = this.getAttribute('data-region');
+    const isActive = activeRegion === region;
+    this.classList.toggle('active', isActive);
+    this.classList.toggle('dimmed', !!activeRegion && !isActive);
+  });
+  d3.select('#usMap').selectAll('.map-border-line').each(function () {
+    this.classList.toggle('active', activeRegion === this.getAttribute('data-region'));
+  });
+}
+
+const REGION_KEY_MAP = { West: 'West', Midwest: 'Midwest', Northeast: 'Northeast', South: 'South' };
+
+function renderMapPanel() {
+  renderMap();
+  const nameEl = document.getElementById('mapRegionName');
+  const calloutEl = document.getElementById('mapCallout');
+  const resetBtn = document.getElementById('mapResetBtn');
+  const rankTitle = document.getElementById('mapRankTitle');
+  const rankSub = document.getElementById('mapRankSub');
+
+  let list, avg, natAvg, colorVar;
+  natAvg = d3.mean(DATA.animals, d => d.total.beat);
+
+  if (!activeRegion) {
+    nameEl.textContent = 'National average';
+    resetBtn.hidden = true;
+    rankTitle.textContent = 'Ranked by national average';
+    rankSub.textContent = "Share of all respondents who think they could beat each animal unarmed.";
+    list = DATA.animals.map(d => ({ animal: d.animal, total: d.total }))
+      .sort((a, b) => b.total.beat - a.total.beat);
+    calloutEl.innerHTML = `<div class="row"><span>Average confidence</span><b>${natAvg.toFixed(1)}%</b></div>
+      <div class="row"><span>Most confidence-inspiring</span><b>${list[0].animal} (${list[0].total.beat}%)</b></div>
+      <div class="row"><span>Most feared</span><b>${list[list.length - 1].animal} (${list[list.length - 1].total.beat}%)</b></div>`;
+    renderGroupedBars(document.getElementById('mapRankSvg'), list, 'total', {});
+    renderLegendInto(document.getElementById('mapRankLegend'), LENS_CONFIG.total);
+    return;
+  }
+
+  const region = REGIONS.find(r => r.key === activeRegion);
+  nameEl.textContent = activeRegion;
+  resetBtn.hidden = false;
+  rankTitle.textContent = `Ranked by confidence in the ${activeRegion}`;
+  rankSub.textContent = `Share of ${activeRegion} respondents who think they could beat each animal unarmed.`;
+
+  list = DATA.animals.map(d => ({ animal: d.animal, total: d.region[REGION_KEY_MAP[activeRegion]] }))
+    .sort((a, b) => b.total.beat - a.total.beat);
+  avg = d3.mean(list, d => d.total.beat);
+
+  let biggest = null, biggestDelta = 0;
+  DATA.animals.forEach(d => {
+    const delta = d.region[REGION_KEY_MAP[activeRegion]].beat - d.total.beat;
+    if (Math.abs(delta) > Math.abs(biggestDelta)) { biggestDelta = delta; biggest = d; }
+  });
+
+  calloutEl.innerHTML = `<div class="row"><span>Average confidence</span><b>${avg.toFixed(1)}%</b> <span style="color:var(--muted)">(nat'l ${natAvg.toFixed(1)}%)</span></div>
+    <div class="row"><span>Most confidence-inspiring</span><b>${list[0].animal} (${list[0].total.beat}%)</b></div>
+    <div class="row"><span>Most feared</span><b>${list[list.length - 1].animal} (${list[list.length - 1].total.beat}%)</b></div>
+    <div class="row"><span>Biggest regional outlier</span><b>${biggest.animal} ${biggestDelta > 0 ? '+' : ''}${biggestDelta}pp</b> vs. national</div>`;
+
+  renderGroupedBars(document.getElementById('mapRankSvg'), list, 'total', { beatColor: region.color });
+  renderLegendInto(document.getElementById('mapRankLegend'), LENS_CONFIG.total, region.color);
+}
+
+document.getElementById('mapResetBtn').addEventListener('click', () => { activeRegion = null; renderMapPanel(); });
+
+// ---------------------------------------------------------------
+// Master render
+// ---------------------------------------------------------------
+function renderAll() {
+  renderChips();
+  renderStatStrip();
+  renderRanking();
+  renderExplore();
+  renderCompare();
+  renderMapPanel();
+}
+
+renderAll();
+</script>
