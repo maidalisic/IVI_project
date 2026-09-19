@@ -1,0 +1,151 @@
+country,animal,animal_de,group_category,group,could_beat_pct,could_not_beat_pct,dont_know_pct,base_weighted,base_unweighted
+US,Rat,Ratte,Total,Total,72,17,11,1224,1224
+US,Rat,Ratte,Gender,Male,76,14,10,596,587
+US,Rat,Ratte,Gender,Female,68,19,13,628,637
+US,Rat,Ratte,Age,18-34,61,25,15,400,435
+US,Rat,Ratte,Age,35-54,77,11,12,332,331
+US,Rat,Ratte,Age,55+,78,14,9,491,458
+US,Rat,Ratte,Region,Northeast,68,17,15,218,195
+US,Rat,Ratte,Region,Midwest,75,15,11,257,279
+US,Rat,Ratte,Region,South,74,15,11,461,447
+US,Rat,Ratte,Region,West,70,21,10,289,303
+US,House cat,Hauskatze,Total,Total,69,18,13,1224,1224
+US,House cat,Hauskatze,Gender,Male,74,16,10,596,587
+US,House cat,Hauskatze,Gender,Female,64,20,16,628,637
+US,House cat,Hauskatze,Age,18-34,57,27,16,400,435
+US,House cat,Hauskatze,Age,35-54,71,16,13,332,331
+US,House cat,Hauskatze,Age,55+,77,12,11,491,458
+US,House cat,Hauskatze,Region,Northeast,69,15,16,218,195
+US,House cat,Hauskatze,Region,Midwest,71,17,12,257,279
+US,House cat,Hauskatze,Region,South,71,17,11,461,447
+US,House cat,Hauskatze,Region,West,64,21,14,289,303
+US,Medium sized dog,Mittelgroßer Hund,Total,Total,49,30,20,1224,1224
+US,Medium sized dog,Mittelgroßer Hund,Gender,Male,60,22,18,596,587
+US,Medium sized dog,Mittelgroßer Hund,Gender,Female,39,38,22,628,637
+US,Medium sized dog,Mittelgroßer Hund,Age,18-34,48,32,20,400,435
+US,Medium sized dog,Mittelgroßer Hund,Age,35-54,51,27,22,332,331
+US,Medium sized dog,Mittelgroßer Hund,Age,55+,49,31,20,491,458
+US,Medium sized dog,Mittelgroßer Hund,Region,Northeast,44,30,26,218,195
+US,Medium sized dog,Mittelgroßer Hund,Region,Midwest,51,28,21,257,279
+US,Medium sized dog,Mittelgroßer Hund,Region,South,53,28,19,461,447
+US,Medium sized dog,Mittelgroßer Hund,Region,West,46,37,18,289,303
+US,Large dog,Großer Hund,Total,Total,23,58,19,1224,1224
+US,Large dog,Großer Hund,Gender,Male,31,49,20,596,587
+US,Large dog,Großer Hund,Gender,Female,15,67,18,628,637
+US,Large dog,Großer Hund,Age,18-34,28,53,18,400,435
+US,Large dog,Großer Hund,Age,35-54,26,53,21,332,331
+US,Large dog,Großer Hund,Age,55+,16,65,18,491,458
+US,Large dog,Großer Hund,Region,Northeast,20,61,19,218,195
+US,Large dog,Großer Hund,Region,Midwest,22,61,17,257,279
+US,Large dog,Großer Hund,Region,South,23,57,20,461,447
+US,Large dog,Großer Hund,Region,West,25,56,19,289,303
+US,Kangaroo,Känguru,Total,Total,14,68,18,1224,1224
+US,Kangaroo,Känguru,Gender,Male,17,62,21,596,587
+US,Kangaroo,Känguru,Gender,Female,11,74,16,628,637
+US,Kangaroo,Känguru,Age,18-34,22,60,18,400,435
+US,Kangaroo,Känguru,Age,35-54,13,67,20,332,331
+US,Kangaroo,Känguru,Age,55+,8,75,17,491,458
+US,Kangaroo,Känguru,Region,Northeast,18,65,17,218,195
+US,Kangaroo,Känguru,Region,Midwest,9,73,18,257,279
+US,Kangaroo,Känguru,Region,South,14,66,20,461,447
+US,Kangaroo,Känguru,Region,West,14,69,16,289,303
+US,Eagle,Adler,Total,Total,30,50,20,1224,1224
+US,Eagle,Adler,Gender,Male,38,41,22,596,587
+US,Eagle,Adler,Gender,Female,23,60,17,628,637
+US,Eagle,Adler,Age,18-34,32,49,18,400,435
+US,Eagle,Adler,Age,35-54,31,48,21,332,331
+US,Eagle,Adler,Age,55+,28,53,19,491,458
+US,Eagle,Adler,Region,Northeast,33,48,20,218,195
+US,Eagle,Adler,Region,Midwest,25,56,19,257,279
+US,Eagle,Adler,Region,South,33,46,21,461,447
+US,Eagle,Adler,Region,West,29,53,18,289,303
+US,Grizzly bear,Grizzlybär,Total,Total,6,85,9,1224,1224
+US,Grizzly bear,Grizzlybär,Gender,Male,7,84,9,596,587
+US,Grizzly bear,Grizzlybär,Gender,Female,6,85,9,628,637
+US,Grizzly bear,Grizzlybär,Age,18-34,12,72,15,400,435
+US,Grizzly bear,Grizzlybär,Age,35-54,5,86,9,332,331
+US,Grizzly bear,Grizzlybär,Age,55+,2,94,4,491,458
+US,Grizzly bear,Grizzlybär,Region,Northeast,6,86,9,218,195
+US,Grizzly bear,Grizzlybär,Region,Midwest,3,89,8,257,279
+US,Grizzly bear,Grizzlybär,Region,South,8,82,10,461,447
+US,Grizzly bear,Grizzlybär,Region,West,7,84,9,289,303
+US,Wolf,Wolf,Total,Total,12,75,13,1224,1224
+US,Wolf,Wolf,Gender,Male,16,68,16,596,587
+US,Wolf,Wolf,Gender,Female,9,82,10,628,637
+US,Wolf,Wolf,Age,18-34,17,67,16,400,435
+US,Wolf,Wolf,Age,35-54,13,74,13,332,331
+US,Wolf,Wolf,Age,55+,8,82,10,491,458
+US,Wolf,Wolf,Region,Northeast,9,77,14,218,195
+US,Wolf,Wolf,Region,Midwest,9,78,12,257,279
+US,Wolf,Wolf,Region,South,13,74,13,461,447
+US,Wolf,Wolf,Region,West,16,71,13,289,303
+US,Lion,Löwe,Total,Total,8,83,9,1224,1224
+US,Lion,Löwe,Gender,Male,7,83,10,596,587
+US,Lion,Löwe,Gender,Female,8,84,8,628,637
+US,Lion,Löwe,Age,18-34,13,72,15,400,435
+US,Lion,Löwe,Age,35-54,7,84,9,332,331
+US,Lion,Löwe,Age,55+,4,92,4,491,458
+US,Lion,Löwe,Region,Northeast,6,86,8,218,195
+US,Lion,Löwe,Region,Midwest,2,91,7,257,279
+US,Lion,Löwe,Region,South,10,80,10,461,447
+US,Lion,Löwe,Region,West,10,81,9,289,303
+US,Gorilla,Gorilla,Total,Total,8,83,9,1224,1224
+US,Gorilla,Gorilla,Gender,Male,9,81,10,596,587
+US,Gorilla,Gorilla,Gender,Female,8,84,8,628,637
+US,Gorilla,Gorilla,Age,18-34,16,71,13,400,435
+US,Gorilla,Gorilla,Age,35-54,7,82,10,332,331
+US,Gorilla,Gorilla,Age,55+,3,92,5,491,458
+US,Gorilla,Gorilla,Region,Northeast,8,83,9,218,195
+US,Gorilla,Gorilla,Region,Midwest,5,88,7,257,279
+US,Gorilla,Gorilla,Region,South,10,80,10,461,447
+US,Gorilla,Gorilla,Region,West,8,83,9,289,303
+US,Chimpanzee,Schimpanse,Total,Total,17,65,19,1224,1224
+US,Chimpanzee,Schimpanse,Gender,Male,22,59,19,596,587
+US,Chimpanzee,Schimpanse,Gender,Female,12,70,18,628,637
+US,Chimpanzee,Schimpanse,Age,18-34,22,57,20,400,435
+US,Chimpanzee,Schimpanse,Age,35-54,14,65,21,332,331
+US,Chimpanzee,Schimpanse,Age,55+,14,71,15,491,458
+US,Chimpanzee,Schimpanse,Region,Northeast,18,66,15,218,195
+US,Chimpanzee,Schimpanse,Region,Midwest,13,70,17,257,279
+US,Chimpanzee,Schimpanse,Region,South,19,61,20,461,447
+US,Chimpanzee,Schimpanse,Region,West,16,64,20,289,303
+US,King Cobra,Königskobra,Total,Total,15,69,15,1224,1224
+US,King Cobra,Königskobra,Gender,Male,23,58,18,596,587
+US,King Cobra,Königskobra,Gender,Female,8,80,12,628,637
+US,King Cobra,Königskobra,Age,18-34,23,58,19,400,435
+US,King Cobra,Königskobra,Age,35-54,12,73,15,332,331
+US,King Cobra,Königskobra,Age,55+,12,76,12,491,458
+US,King Cobra,Königskobra,Region,Northeast,13,73,14,218,195
+US,King Cobra,Königskobra,Region,Midwest,11,76,13,257,279
+US,King Cobra,Königskobra,Region,South,18,65,16,461,447
+US,King Cobra,Königskobra,Region,West,17,67,16,289,303
+US,Elephant,Elefant,Total,Total,8,82,9,1224,1224
+US,Elephant,Elefant,Gender,Male,9,82,9,596,587
+US,Elephant,Elefant,Gender,Female,8,83,10,628,637
+US,Elephant,Elefant,Age,18-34,16,69,14,400,435
+US,Elephant,Elefant,Age,35-54,8,82,10,332,331
+US,Elephant,Elefant,Age,55+,2,93,5,491,458
+US,Elephant,Elefant,Region,Northeast,6,84,10,218,195
+US,Elephant,Elefant,Region,Midwest,6,87,8,257,279
+US,Elephant,Elefant,Region,South,9,80,11,461,447
+US,Elephant,Elefant,Region,West,11,81,8,289,303
+US,Crocodile,Krokodil,Total,Total,9,79,12,1224,1224
+US,Crocodile,Krokodil,Gender,Male,10,76,13,596,587
+US,Crocodile,Krokodil,Gender,Female,8,82,10,628,637
+US,Crocodile,Krokodil,Age,18-34,17,67,16,400,435
+US,Crocodile,Krokodil,Age,35-54,7,82,11,332,331
+US,Crocodile,Krokodil,Age,55+,4,87,8,491,458
+US,Crocodile,Krokodil,Region,Northeast,7,81,12,218,195
+US,Crocodile,Krokodil,Region,Midwest,5,86,10,257,279
+US,Crocodile,Krokodil,Region,South,11,77,12,461,447
+US,Crocodile,Krokodil,Region,West,12,76,13,289,303
+US,Goose,Gans,Total,Total,61,24,15,1224,1224
+US,Goose,Gans,Gender,Male,71,16,13,596,587
+US,Goose,Gans,Gender,Female,51,32,17,628,637
+US,Goose,Gans,Age,18-34,53,31,16,400,435
+US,Goose,Gans,Age,35-54,64,21,16,332,331
+US,Goose,Gans,Age,55+,66,21,13,491,458
+US,Goose,Gans,Region,Northeast,58,23,18,218,195
+US,Goose,Gans,Region,Midwest,59,26,15,257,279
+US,Goose,Gans,Region,South,65,22,13,461,447
+US,Goose,Gans,Region,West,58,28,14,289,303
